@@ -101,6 +101,26 @@ function InstallCUDADrivers() {
         fi
     ;;
 
+    sles_15)
+        CUDA_REPO_PKG="cuda-repo-sles15-${CUDADriverVersion}.x86_64.rpm"
+        LogMsg "Using ${CUDA_REPO_PKG}"
+
+        wget http://developer.download.nvidia.com/compute/cuda/repos/sles15/x86_64/"${CUDA_REPO_PKG}" -O /tmp/"${CUDA_REPO_PKG}"
+        if [ $? -ne 0 ]; then
+            LogErr "Failed to download ${CUDA_REPO_PKG}"
+            SetTestStateAborted
+            return 1
+        fi
+
+        rpm -ivh /tmp/"${CUDA_REPO_PKG}"
+        yum --nogpgcheck -y install cuda-drivers > ${HOME}/install_drivers.log 2>&1
+        if [ $? -ne 0 ]; then
+            LogErr "Failed to install the cuda-drivers!"
+            SetTestStateAborted
+            return 1
+        fi
+    ;;
+
     ubuntu*)
         GetOSVersion
         # Temporary fix till driver for ubuntu19 series list under http://developer.download.nvidia.com/compute/cuda/repos/
@@ -129,6 +149,7 @@ function InstallCUDADrivers() {
             return 1
         fi
     ;;
+
     redhat_8)
         LogMsg "$DISTRO not supported. Skip the test."
         SetTestStateSkipped

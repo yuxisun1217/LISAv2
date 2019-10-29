@@ -129,7 +129,7 @@ function InstallCUDADrivers() {
             return 1
         fi
     ;;
-    suse*|redhat_8)
+    redhat_8)
         LogMsg "$DISTRO not supported. Skip the test."
         SetTestStateSkipped
         exit 0

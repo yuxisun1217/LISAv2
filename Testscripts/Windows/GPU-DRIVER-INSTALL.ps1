@@ -212,7 +212,11 @@ function Main {
         Write-Debug "Added GPU driver name to constants.sh file"
 
         # For CentOS and RedHat the requirement is to install LIS RPMs
-        if (@("REDHAT", "CENTOS").contains($global:detectedDistro)) {
+        # TODO:When LIS supports RHEL-8, remove this redhat_8 distro condition
+        $distro = Run-LinuxCmd -ip $allVMData.PublicIP -port $allVMData.SSHPort -username $superuser -password $password `
+            -command ". utils.sh ; GetDistro > /dev/null ; echo `$DISTRO"
+        Write-LogInfo "Distro version is: $distro"
+        if (@("REDHAT", "CENTOS").contains($global:detectedDistro) -and ($distro -ne "redhat_8")) {
             # HPC images already have the LIS RPMs installed
             $sts = Run-LinuxCmd -ip $allVMData.PublicIP -port $allVMData.SSHPort -username $user -password $password `
                 -command "rpm -qa | grep kmod-microsoft-hyper-v && rpm -qa | grep microsoft-hyper-v" -ignoreLinuxExitCode
